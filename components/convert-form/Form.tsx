@@ -12,12 +12,12 @@ interface Props {
 const Form = ({ onSubmit, error }: Props) => {
   const {
     register,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useFormContext<FormSchema>();
 
   return (
     <form
-      className="text-gray-50 w-full max-w-lg mx-auto flex flex-col gap-y-5"
+      className="text-gray-50 w-full flex flex-col gap-y-5"
       onSubmit={onSubmit}
     >
       <input
@@ -34,10 +34,11 @@ const Form = ({ onSubmit, error }: Props) => {
         <button
           type="submit"
           className="block px-3 py-2 border border-gray-50 rounded-md w-full mb-2 hover:bg-gray-50 hover:text-gray-800 hover:border-gray-800 transition disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:text-gray-800 disabled:border-gray-800 disabled:cursor-not-allowed"
+          disabled={isSubmitting}
         >
           Submit
         </button>
-        <small className="italic text-sm">Size limit: 20mb</small>
+        <small className="italic text-sm">Size limit: 10mb</small>
       </div>
     </form>
   );

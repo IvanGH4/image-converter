@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB in bytes
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/png",
@@ -11,13 +11,15 @@ const ACCEPTED_IMAGE_TYPES = [
 export const formSchema = z.object({
   file: z
     .any()
-    .refine((files) => files?.length >= 1, { message: "An image is required." })
+    .refine((files) => files?.length >= 1, {
+      message: "Please upload an image.",
+    })
     .refine(
-      (files) => files[0].size <= MAX_FILE_SIZE,
+      (files) => files[0]?.size <= MAX_FILE_SIZE,
       `Image size must be less than ${MAX_FILE_SIZE / 1024 / 1024}MB.`
     )
     .refine(
-      (files) => ACCEPTED_IMAGE_TYPES.includes(files[0].type),
+      (files) => ACCEPTED_IMAGE_TYPES.includes(files[0]?.type),
       `Only the following image types are allowed: ${ACCEPTED_IMAGE_TYPES.join(
         ", "
       )}.`
