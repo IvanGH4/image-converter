@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import axios, { AxiosResponse } from "axios";
 
-import Form from "./Form";
+import ConvertForm from "./Form";
 
 import { formSchema, FormSchema } from "@/utils/validation/form";
 import { removeFileExtension } from "@/utils/removeFileName";
@@ -63,7 +63,7 @@ const FormContainer = () => {
   return (
     <section className="max-w-lg mx-auto">
       <FormProvider {...form}>
-        <Form onSubmit={handleSubmit(onSubmit)} error={error} />
+        <ConvertForm onSubmit={handleSubmit(onSubmit)} error={error} />
         {originalFileSize && newFileSize && (
           <p className="text-lg font-semibold mt-10 flex items-center gap-2 text-neutral-200">
             <BiCheckCircle
