@@ -65,7 +65,7 @@ const FormContainer = () => {
       <FormProvider {...form}>
         <Form onSubmit={handleSubmit(onSubmit)} error={error} />
         {originalFileSize && newFileSize && (
-          <p className="text-lg font-semibold mt-10 flex items-center gap-2 text-gray-50">
+          <p className="text-lg font-semibold mt-10 flex items-center gap-2 text-neutral-200">
             <BiCheckCircle
               width={20}
               height={20}
