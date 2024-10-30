@@ -24,7 +24,7 @@ export const formSchema = z.object({
         ", "
       )}.`
     ),
-  breakpoint: z.array(z.string()).optional(),
+  breakpoints: z.array(z.string()).optional(),
 });
 
 export type FormSchema = z.infer<typeof formSchema>;

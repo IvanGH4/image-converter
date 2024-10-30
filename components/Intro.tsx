@@ -11,7 +11,7 @@ const Intro = () => {
         <span className="italic font-medium text-green-600">any</span> format to
         webp.
       </p>
-      <p className="text-center text-lg text-neutral-200 mb-10">
+      <p className="text-center text-lg text-neutral-200 mb-10 max-w-xl mx-auto">
         Improve your website{" "}
         <span className="italic font-medium text-green-600">performance</span>{" "}
         by making your images smaller and converting them to a browser friendly

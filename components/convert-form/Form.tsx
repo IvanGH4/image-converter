@@ -64,7 +64,7 @@ const ConvertForm = ({ onSubmit, error }: Props) => {
         />
         <FormField
           control={control}
-          name="breakpoint"
+          name="breakpoints"
           render={() => (
             <FormItem className="mt-5">
               <FormLabel className="text-neutral-200">
@@ -74,7 +74,7 @@ const ConvertForm = ({ onSubmit, error }: Props) => {
               {breakpoints.map((item) => (
                 <FormField
                   control={control}
-                  name="breakpoint"
+                  name="breakpoints"
                   key={item}
                   render={({ field }) => (
                     <FormControl className="items-start flex space-x-2 py-1">
