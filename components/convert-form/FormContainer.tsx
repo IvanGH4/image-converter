@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import axios, { AxiosResponse } from "axios";
 
-import Form from "./Form";
+import ConvertForm from "./Form";
 
 import { formSchema, FormSchema } from "@/utils/validation/form";
 import { removeFileExtension } from "@/utils/removeFileName";
@@ -20,6 +20,7 @@ const FormContainer = () => {
     undefined
   );
   const [newFileSize, setNewFileSize] = useState<number | undefined>(undefined);
+  const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
   const form = useForm<FormSchema>({
@@ -29,6 +30,8 @@ const FormContainer = () => {
   const { handleSubmit, reset } = form;
 
   const onSubmit: SubmitHandler<FormSchema> = async (data) => {
+    setSuccess(false);
+    setError(undefined);
     try {
       const formData = new FormData();
       const file = data.file[0] as File;
@@ -37,13 +40,34 @@ const FormContainer = () => {
       setOriginalFileSize(file.size);
 
       formData.append("file", file);
+
+      const breakpoints = data.breakpoints;
+
+      if (breakpoints) {
+        formData.append("breakpoints", JSON.stringify(breakpoints));
+      }
+
       const {
         data: { result },
-      }: AxiosResponse<{ result: string }> = await axios.post(
-        "/api/convert",
-        formData
-      );
+      }: AxiosResponse<{
+        result: string | { object: string; breakpoint: string }[];
+      }> = await axios.post("/api/convert", formData);
 
+      if (Array.isArray(result)) {
+        setSuccess(true);
+        result.forEach((item) => {
+          const link = document.createElement("a");
+          link.href = `data:image/webp;base64,${item.object}`;
+          link.download = `${removeFileExtension(file.name)}_${item.breakpoint}.webp`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+        reset();
+        return;
+      }
+
+      setSuccess(true);
       setNewFileSize(getFileSizeFromBase64(result, `image/${format}`));
 
       // download generated file
@@ -63,9 +87,14 @@ const FormContainer = () => {
   return (
     <section className="max-w-lg mx-auto">
       <FormProvider {...form}>
-        <Form onSubmit={handleSubmit(onSubmit)} error={error} />
+        <ConvertForm onSubmit={handleSubmit(onSubmit)} error={error} />
+        {success && (
+          <p className="text-green-600 font-medium text-lg my-3">
+            Image converted successfully!
+          </p>
+        )}
         {originalFileSize && newFileSize && (
-          <p className="text-lg font-semibold mt-10 flex items-center gap-2 text-gray-50">
+          <p className="text-lg font-semibold mt-10 flex items-center gap-2 text-neutral-200">
             <BiCheckCircle
               width={20}
               height={20}

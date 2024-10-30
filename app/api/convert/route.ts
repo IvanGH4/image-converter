@@ -9,6 +9,11 @@ export const POST = async (request: NextRequest) => {
   const file = formData.get("file") as File;
   const format = file.name.split(".").pop();
 
+  const breakpointsData = formData.get("breakpoints") as string | undefined;
+  let breakpoints: undefined | string[];
+
+  if (breakpointsData) breakpoints = JSON.parse(breakpointsData);
+
   // validate format
   if (format && !ACCEPTED_FORMATS.includes(format))
     return NextResponse.json({ ok: false }, { status: 400 });
@@ -29,6 +34,40 @@ export const POST = async (request: NextRequest) => {
 
   try {
     const fileBuffer = await file.arrayBuffer();
+
+    const { width, height } = await sharp(fileBuffer).metadata();
+
+    if (breakpoints) {
+      const results: Promise<{ object: Buffer; breakpoint: string }[]> =
+        Promise.all(
+          breakpoints.map(async (breakpoint) => {
+            if (Number(width) > Number(breakpoint)) {
+              const heightToResize = Math.round(
+                Number(breakpoint) * (Number(height) / Number(width))
+              );
+
+              const resizedObject = await sharp(fileBuffer)
+                .resize(Number(breakpoint), heightToResize)
+                .webp(webpOptions)
+                .toBuffer();
+
+              return { object: resizedObject, breakpoint };
+            } else {
+              const resultBuffer = await sharp(fileBuffer)
+                .webp(webpOptions)
+                .toBuffer();
+              return { object: resultBuffer, breakpoint };
+            }
+          })
+        );
+
+      const parsedResults = (await results).map((item) => ({
+        object: item.object.toString("base64"),
+        breakpoint: item.breakpoint,
+      }));
+      return NextResponse.json({ result: parsedResults }, { status: 200 });
+    }
+
     const resultBuffer = await sharp(fileBuffer).webp(webpOptions).toBuffer();
     const base64Image = resultBuffer.toString("base64");
     return NextResponse.json({ result: base64Image }, { status: 200 });
